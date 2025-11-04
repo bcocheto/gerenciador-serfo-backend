@@ -17,6 +17,8 @@ curl -s http://localhost:3001/
 
 echo ""
 echo ""
+echo "=== TESTES DE VOLUNTÁRIOS ==="
+echo ""
 echo "3. 👥 Testando listagem de voluntários..."
 curl -s http://localhost:3001/api/v1/voluntarios
 
@@ -39,6 +41,40 @@ curl -s -X POST http://localhost:3001/api/v1/voluntarios \
     "dataIngresso": "'$(date -Iseconds)'",
     "observacoes": "Voluntária criada via teste da API"
   }'
+
+echo ""
+echo ""
+echo "=== TESTES DE ASSISTIDOS ==="
+echo ""
+echo "6. 👥 Testando listagem de assistidos..."
+curl -s http://localhost:3001/api/v1/assistidos
+
+echo ""
+echo ""
+echo "7. 📊 Testando estatísticas de assistidos..."
+curl -s http://localhost:3001/api/v1/assistidos/statistics
+
+echo ""
+echo ""
+echo "8. ✨ Testando criação de assistido..."
+curl -s -X POST http://localhost:3001/api/v1/assistidos \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nomeCompleto": "Carlos Silva",
+    "cpf": "99988877766",
+    "telefone": "(11) 77777-7777",
+    "email": "carlos.silva@email.com",
+    "endereco": "Av. Principal, 789, Jardim Norte, São Paulo - SP",
+    "dataIngresso": "'$(date -Iseconds)'",
+    "valorMensal": 100.00,
+    "diaVencimento": 5,
+    "observacoes": "Assistido criado via teste da API"
+  }'
+
+echo ""
+echo ""
+echo "9. 🔍 Testando busca de assistidos por dia de vencimento..."
+curl -s http://localhost:3001/api/v1/assistidos/vencimento/15
 
 echo ""
 echo ""

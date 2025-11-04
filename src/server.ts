@@ -58,6 +58,7 @@ app.get("/", (req, res) => {
     endpoints: {
       health: "/api/v1/health",
       voluntarios: "/api/v1/voluntarios",
+      assistidos: "/api/v1/assistidos",
       docs: "/api/v1/docs", // Para futura documentação
     },
   });

@@ -60,6 +60,7 @@ app.get("/", (req, res) => {
       voluntarios: "/api/v1/voluntarios",
       assistidos: "/api/v1/assistidos",
       movimentacoes: "/api/v1/movimentacoes",
+      contribuicoes: "/api/v1/contribuicoes",
       docs: "/api/v1/docs", // Para futura documentação
     },
   });

@@ -3,6 +3,7 @@ import { Router } from "express";
 import voluntarioRoutes from "./voluntarioRoutes.js";
 import assistidoRoutes from "./assistidoRoutes.js";
 import movimentacaoRoutes from "./movimentacaoRoutes.js";
+import contribuicaoRoutes from "./contribuicaoRoutes.js";
 
 const router = Router();
 
@@ -10,6 +11,7 @@ const router = Router();
 router.use("/voluntarios", voluntarioRoutes);
 router.use("/assistidos", assistidoRoutes);
 router.use("/movimentacoes", movimentacaoRoutes);
+router.use("/contribuicoes", contribuicaoRoutes);
 
 // Rota de health check
 router.get("/health", (req, res) => {
@@ -21,6 +23,7 @@ router.get("/health", (req, res) => {
       voluntarios: "/api/v1/voluntarios",
       assistidos: "/api/v1/assistidos",
       movimentacoes: "/api/v1/movimentacoes",
+      contribuicoes: "/api/v1/contribuicoes",
     },
   });
 });

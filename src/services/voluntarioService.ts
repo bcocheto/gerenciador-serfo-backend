@@ -1,4 +1,3 @@
-// src/services/voluntarioService.ts
 import { prisma } from "../config/database.js";
 import type {
   VoluntarioCreate,
@@ -30,11 +29,18 @@ export class VoluntarioService {
         }
       }
 
+      const createData = {
+        nomeCompleto: data.nomeCompleto,
+        email: data.email,
+        dataIngresso: new Date(data.dataIngresso),
+        cpf: data.cpf || null,
+        telefone: data.telefone || null,
+        endereco: data.endereco || null,
+        observacoes: data.observacoes || null,
+      };
+
       const voluntario = await prisma.voluntario.create({
-        data: {
-          ...data,
-          dataIngresso: new Date(data.dataIngresso),
-        },
+        data: createData,
       });
 
       return voluntario;
@@ -78,11 +84,6 @@ export class VoluntarioService {
           skip,
           take: limit,
           orderBy: { [orderBy]: orderDirection },
-          include: {
-            _count: {
-              select: { contribuicoes: true },
-            },
-          },
         }),
         prisma.voluntario.count({ where }),
       ]);
@@ -105,15 +106,6 @@ export class VoluntarioService {
     try {
       const voluntario = await prisma.voluntario.findUnique({
         where: { id },
-        include: {
-          contribuicoes: {
-            orderBy: { criadoEm: "desc" },
-            take: 10,
-          },
-          _count: {
-            select: { contribuicoes: true },
-          },
-        },
       });
 
       if (!voluntario) {
@@ -160,10 +152,20 @@ export class VoluntarioService {
         }
       }
 
-      const updateData: any = { ...data };
-      if (data.dataIngresso) {
+      const updateData: Record<string, any> = {};
+
+      if (data.nomeCompleto !== undefined)
+        updateData.nomeCompleto = data.nomeCompleto;
+      if (data.email !== undefined) updateData.email = data.email;
+      if (data.cpf !== undefined) updateData.cpf = data.cpf || null;
+      if (data.telefone !== undefined)
+        updateData.telefone = data.telefone || null;
+      if (data.endereco !== undefined)
+        updateData.endereco = data.endereco || null;
+      if (data.observacoes !== undefined)
+        updateData.observacoes = data.observacoes || null;
+      if (data.dataIngresso !== undefined)
         updateData.dataIngresso = new Date(data.dataIngresso);
-      }
 
       const voluntario = await prisma.voluntario.update({
         where: { id },
@@ -188,20 +190,20 @@ export class VoluntarioService {
         throw new AppError("Voluntário não encontrado", 404);
       }
 
-      // Verificar se tem contribuições ativas
-      const activeContributions = await prisma.contribuicao.count({
-        where: {
-          voluntarioId: id,
-          status: { in: ["pendente", "pago"] },
-        },
-      });
+      // Verificar se tem contribuições ativas (por enquanto, vamos comentar até criar a tabela)
+      // const activeContributions = await prisma.contribuicao.count({
+      //   where: {
+      //     voluntarioId: id,
+      //     status: { in: ["pendente", "pago"] },
+      //   },
+      // });
 
-      if (activeContributions > 0) {
-        throw new AppError(
-          "Não é possível excluir voluntário com contribuições ativas",
-          400
-        );
-      }
+      // if (activeContributions > 0) {
+      //   throw new AppError(
+      //     "Não é possível excluir voluntário com contribuições ativas",
+      //     400
+      //   );
+      // }
 
       await prisma.voluntario.delete({
         where: { id },

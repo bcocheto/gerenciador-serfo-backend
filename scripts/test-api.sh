@@ -29,52 +29,53 @@ curl -s http://localhost:3001/api/v1/voluntarios/statistics
 
 echo ""
 echo ""
-echo "5. ✨ Testando criação de voluntário..."
-curl -s -X POST http://localhost:3001/api/v1/voluntarios \
-  -H "Content-Type: application/json" \
-  -d '{
-    "nomeCompleto": "Ana Costa",
-    "cpf": "55566677788",
-    "telefone": "(11) 66666-6666",
-    "email": "ana.costa@serfo.org",
-    "endereco": "Rua das Flores, 321, Centro, São Paulo - SP",
-    "dataIngresso": "'$(date -Iseconds)'",
-    "observacoes": "Voluntária criada via teste da API"
-  }'
-
-echo ""
-echo ""
 echo "=== TESTES DE ASSISTIDOS ==="
 echo ""
-echo "6. 👥 Testando listagem de assistidos..."
+echo "5. 👥 Testando listagem de assistidos..."
 curl -s http://localhost:3001/api/v1/assistidos
 
 echo ""
 echo ""
-echo "7. 📊 Testando estatísticas de assistidos..."
+echo "6. 📊 Testando estatísticas de assistidos..."
 curl -s http://localhost:3001/api/v1/assistidos/statistics
 
 echo ""
 echo ""
-echo "8. ✨ Testando criação de assistido..."
-curl -s -X POST http://localhost:3001/api/v1/assistidos \
+echo "=== TESTES DE MOVIMENTAÇÕES ==="
+echo ""
+echo "7. � Testando listagem de movimentações..."
+curl -s http://localhost:3001/api/v1/movimentacoes
+
+echo ""
+echo ""
+echo "8. 📊 Testando estatísticas de movimentações..."
+curl -s http://localhost:3001/api/v1/movimentacoes/statistics
+
+echo ""
+echo ""
+echo "9. ✨ Testando criação de movimentação..."
+curl -s -X POST http://localhost:3001/api/v1/movimentacoes \
   -H "Content-Type: application/json" \
   -d '{
-    "nomeCompleto": "Carlos Silva",
-    "cpf": "99988877766",
-    "telefone": "(11) 77777-7777",
-    "email": "carlos.silva@email.com",
-    "endereco": "Av. Principal, 789, Jardim Norte, São Paulo - SP",
-    "dataIngresso": "'$(date -Iseconds)'",
-    "valorMensal": 100.00,
-    "diaVencimento": 5,
-    "observacoes": "Assistido criado via teste da API"
+    "data": "'$(date -Iseconds)'",
+    "descricao": "Contribuição mensal - Teste API",
+    "valor": 150.00,
+    "tipo": "entrada",
+    "categoria": "Contribuições",
+    "conta": "Conta Principal",
+    "favorecidoPagador": "Teste Contribuinte",
+    "observacoes": "Movimentação criada via teste da API"
   }'
 
 echo ""
 echo ""
-echo "9. 🔍 Testando busca de assistidos por dia de vencimento..."
-curl -s http://localhost:3001/api/v1/assistidos/vencimento/15
+echo "10. � Testando resumo financeiro..."
+curl -s http://localhost:3001/api/v1/movimentacoes/resumo
+
+echo ""
+echo ""
+echo "11. 📊 Testando relatório por categoria..."
+curl -s http://localhost:3001/api/v1/movimentacoes/relatorio/categoria
 
 echo ""
 echo ""

@@ -59,6 +59,7 @@ app.get("/", (req, res) => {
       health: "/api/v1/health",
       voluntarios: "/api/v1/voluntarios",
       assistidos: "/api/v1/assistidos",
+      movimentacoes: "/api/v1/movimentacoes",
       docs: "/api/v1/docs", // Para futura documentação
     },
   });

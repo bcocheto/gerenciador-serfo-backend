@@ -61,6 +61,7 @@ app.get("/", (req, res) => {
       assistidos: "/api/v1/assistidos",
       movimentacoes: "/api/v1/movimentacoes",
       contribuicoes: "/api/v1/contribuicoes",
+      relatorios: "/api/v1/relatorios",
       docs: "/api/v1/docs", // Para futura documentação
     },
   });

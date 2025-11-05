@@ -46,7 +46,7 @@ export class NotaFiscalService {
       }
 
       // Verificar se já existe nota fiscal para esta contribuição
-      const notaExistente = await prisma.notaFiscal.findUnique({
+      const notaExistente = await prisma.notaFiscal.findFirst({
         where: { contribuicaoId: data.contribuicaoId },
       });
 
@@ -488,7 +488,9 @@ export class NotaFiscalService {
       const contribuicoes = await prisma.contribuicao.findMany({
         where: {
           status: "pago",
-          notaFiscal: null,
+          notasFiscais: {
+            none: {},
+          },
         },
         include: {
           voluntario: {

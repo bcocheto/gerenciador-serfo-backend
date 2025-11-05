@@ -123,7 +123,7 @@ export class TemplateEmailService {
     try {
       const templates = await prisma.templateEmail.findMany({
         where: {
-          tipo,
+          tipo: tipo as any,
           ativo: true,
         },
         orderBy: { nome: "asc" },

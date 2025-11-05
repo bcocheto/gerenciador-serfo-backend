@@ -204,7 +204,7 @@ export class ContribuicaoService {
               telefone: true,
             },
           },
-          notaFiscal: true,
+          notasFiscais: true,
         },
       });
 
@@ -275,7 +275,7 @@ export class ContribuicaoService {
       }
 
       // Verificar se tem nota fiscal associada
-      const notaFiscal = await prisma.notaFiscal.findUnique({
+      const notaFiscal = await prisma.notaFiscal.findFirst({
         where: { contribuicaoId: id },
       });
 
@@ -330,7 +330,7 @@ export class ContribuicaoService {
         data: {
           status: "pago",
           dataPagamento: new Date(dadosPagamento.dataPagamento),
-          formaPagamento: dadosPagamento.formaPagamento,
+          formaPagamento: dadosPagamento.formaPagamento as any,
           comprovante: dadosPagamento.comprovante || null,
           observacoes: dadosPagamento.observacoes || contribuicao.observacoes,
         },

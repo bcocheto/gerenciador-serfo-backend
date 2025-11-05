@@ -1,4 +1,4 @@
-// prisma/schema.prisma
+// Configuração do Prisma
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,18 +8,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Modelo de Voluntário
 model Voluntario {
-  id            Int      @id @default(autoincrement())
-  nomeCompleto  String   @map("nome_completo")
-  cpf           String?  @unique
-  telefone      String?
-  email         String   @unique
-  endereco      String?
-  dataIngresso  DateTime @map("data_ingresso")
-  status        String   @default("ativo") // "ativo", "inativo", "suspenso"
-  observacoes   String?
-  criadoEm      DateTime @default(now()) @map("criado_em")
-  atualizadoEm  DateTime @updatedAt @map("atualizado_em")
+  id           Int      @id @default(autoincrement())
+  nomeCompleto String   @map("nome_completo") @db.VarChar(100)
+  cpf          String?  @unique @db.VarChar(11)
+  telefone     String?  @db.VarChar(20)
+  email        String   @unique @db.VarChar(100)
+  endereco     String?  @db.Text
+  dataIngresso DateTime @map("data_ingresso") @db.Timestamp(6)
+  observacoes  String?  @db.Text
+  ativo        Boolean  @default(true)
+  status       String   @default("ativo") @db.VarChar(20) // Para compatibilidade com código existente
+  criadoEm     DateTime @default(now()) @map("criado_em") @db.Timestamp(6)
+  atualizadoEm DateTime @updatedAt @map("atualizado_em") @db.Timestamp(6)
 
   // Relacionamentos
   contribuicoes Contribuicao[]
@@ -27,20 +29,22 @@ model Voluntario {
   @@map("voluntarios")
 }
 
+// Modelo de Assistido
 model Assistido {
-  id            Int      @id @default(autoincrement())
-  nomeCompleto  String   @map("nome_completo")
-  cpf           String?  @unique
-  telefone      String?
-  email         String   @unique
-  endereco      String?
-  dataIngresso  DateTime @map("data_ingresso")
-  valorMensal   Decimal  @map("valor_mensal")
-  diaVencimento Int      @map("dia_vencimento") // Dia do mês para vencimento
-  status        String   @default("ativo") // "ativo", "inativo", "suspenso"
-  observacoes   String?
-  criadoEm      DateTime @default(now()) @map("criado_em")
-  atualizadoEm  DateTime @updatedAt @map("atualizado_em")
+  id             Int      @id @default(autoincrement())
+  nomeCompleto   String   @map("nome_completo") @db.VarChar(100)
+  cpf            String?  @unique @db.VarChar(11)
+  telefone       String?  @db.VarChar(20)
+  email          String   @unique @db.VarChar(100)
+  endereco       String?  @db.Text
+  dataIngresso   DateTime @map("data_ingresso") @db.Timestamp(6)
+  valorMensal    Decimal  @map("valor_mensal") @db.Decimal(10, 2)
+  diaVencimento  Int      @map("dia_vencimento") @db.Integer
+  observacoes    String?  @db.Text
+  ativo          Boolean  @default(true)
+  status         String   @default("ativo") @db.VarChar(20) // Para compatibilidade com código existente
+  criadoEm       DateTime @default(now()) @map("criado_em") @db.Timestamp(6)
+  atualizadoEm   DateTime @updatedAt @map("atualizado_em") @db.Timestamp(6)
 
   // Relacionamentos
   contribuicoes Contribuicao[]
@@ -48,109 +52,180 @@ model Assistido {
   @@map("assistidos")
 }
 
+// Modelo de Contribuição
 model Contribuicao {
-  id               Int       @id @default(autoincrement())
-  voluntarioId     Int?      @map("voluntario_id")
-  assistidoId      Int?      @map("assistido_id")
-  valor            Decimal
-  dataVencimento   DateTime  @map("data_vencimento")
-  dataPagamento    DateTime? @map("data_pagamento")
-  status           String    @default("pendente") // "pendente", "pago", "atrasado", "cancelado"
-  formaPagamento   String?   @map("forma_pagamento") // "pix", "boleto", "transferencia", etc.
-  comprovante      String? // URL ou path do comprovante
-  observacoes      String?
-  emailEnviado     Boolean   @default(false) @map("email_enviado")
-  dataEmailEnvio   DateTime? @map("data_email_envio")
-  criadoEm         DateTime  @default(now()) @map("criado_em")
-  atualizadoEm     DateTime  @updatedAt @map("atualizado_em")
+  id              Int                      @id @default(autoincrement())
+  voluntarioId    Int?                     @map("voluntario_id")
+  assistidoId     Int?                     @map("assistido_id")
+  valor           Decimal                  @db.Decimal(10, 2)
+  dataVencimento  DateTime                 @map("data_vencimento") @db.Timestamp(6)
+  dataPagamento   DateTime?                @map("data_pagamento") @db.Timestamp(6)
+  status          StatusContribuicao       @default(pendente)
+  formaPagamento  FormaPagamento?          @map("forma_pagamento")
+  comprovante     String?                  @db.Text // Caminho do arquivo de comprovante
+  observacoes     String?                  @db.Text
+  criadoEm        DateTime                 @default(now()) @map("criado_em") @db.Timestamp(6)
+  atualizadoEm    DateTime                 @updatedAt @map("atualizado_em") @db.Timestamp(6)
 
   // Relacionamentos
-  voluntario Voluntario? @relation(fields: [voluntarioId], references: [id])
-  assistido  Assistido?  @relation(fields: [assistidoId], references: [id])
-  notaFiscal NotaFiscal?
+  voluntario    Voluntario?    @relation(fields: [voluntarioId], references: [id], onDelete: SetNull)
+  assistido     Assistido?     @relation(fields: [assistidoId], references: [id], onDelete: SetNull)
+  movimentacoes Movimentacao[]
+  notasFiscais  NotaFiscal[]
 
   @@map("contribuicoes")
 }
 
+// Modelo de Movimentação Financeira
 model Movimentacao {
   id                Int      @id @default(autoincrement())
-  data              DateTime
-  descricao         String
-  valor             Decimal
-  tipo              String // "entrada" ou "saida"
-  categoria         String
-  conta             String
-  centroDeCusto     String?  @map("centro_de_custo")
-  favorecidoPagador String?  @map("favorecido_pagador")
-  contribuicaoId    Int?     @map("contribuicao_id") // Referência à contribuição se aplicável
-  observacoes       String?
-  criadoEm          DateTime @default(now()) @map("criado_em")
-  atualizadoEm      DateTime @updatedAt @map("atualizado_em")
+  data              DateTime @db.Timestamp(6)
+  descricao         String   @db.VarChar(200)
+  valor             Decimal  @db.Decimal(10, 2)
+  tipo              TipoMovimentacao
+  categoria         String   @db.VarChar(50)
+  conta             String   @db.VarChar(50)
+  centroDeCusto     String?  @map("centro_de_custo") @db.VarChar(50)
+  favorecidoPagador String?  @map("favorecido_pagador") @db.VarChar(100)
+  contribuicaoId    Int?     @map("contribuicao_id")
+  observacoes       String?  @db.Text
+  criadoEm          DateTime @default(now()) @map("criado_em") @db.Timestamp(6)
+  atualizadoEm      DateTime @updatedAt @map("atualizado_em") @db.Timestamp(6)
+
+  // Relacionamentos
+  contribuicao Contribuicao? @relation(fields: [contribuicaoId], references: [id], onDelete: SetNull)
 
   @@map("movimentacoes")
 }
 
+// Modelo de Nota Fiscal
 model NotaFiscal {
-  id             Int      @id @default(autoincrement())
-  numero         String   @unique
-  contribuicaoId Int      @unique @map("contribuicao_id")
-  valor          Decimal
-  dataEmissao    DateTime @map("data_emissao")
-  status         String   @default("emitida") // "emitida", "cancelada"
-  arquivo        String? // URL ou path do arquivo PDF
-  observacoes    String?
-  criadoEm       DateTime @default(now()) @map("criado_em")
+  id             Int                 @id @default(autoincrement())
+  numero         String              @unique @db.VarChar(50)
+  contribuicaoId Int                 @map("contribuicao_id")
+  dataEmissao    DateTime            @default(now()) @map("data_emissao") @db.Timestamp(6)
+  valor          Decimal             @db.Decimal(10, 2)
+  status         StatusNotaFiscal    @default(emitida)
+  arquivo        String?             @db.Text // Caminho para o arquivo da nota fiscal
+  observacoes    String?             @db.Text
+  criadoEm       DateTime            @default(now()) @map("criado_em") @db.Timestamp(6)
+  atualizadoEm   DateTime            @updatedAt @map("atualizado_em") @db.Timestamp(6)
 
   // Relacionamentos
-  contribuicao Contribuicao @relation(fields: [contribuicaoId], references: [id])
+  contribuicao Contribuicao @relation(fields: [contribuicaoId], references: [id], onDelete: Cascade)
 
   @@map("notas_fiscais")
 }
 
+// Modelo de Template de Email
 model TemplateEmail {
-  id        Int      @id @default(autoincrement())
-  nome      String   @unique
-  assunto   String
-  corpo     String   @db.Text // HTML template
-  tipo      String   // "cobranca", "lembrete", "agradecimento", etc.
-  ativo     Boolean  @default(true)
-  criadoEm  DateTime @default(now()) @map("criado_em")
-  atualizadoEm DateTime @updatedAt @map("atualizado_em")
+  id           Int               @id @default(autoincrement())
+  nome         String            @unique @db.VarChar(100)
+  assunto      String            @db.VarChar(200)
+  corpo        String            @db.Text
+  tipo         TipoTemplateEmail
+  ativo        Boolean           @default(true)
+  criadoEm     DateTime          @default(now()) @map("criado_em") @db.Timestamp(6)
+  atualizadoEm DateTime          @updatedAt @map("atualizado_em") @db.Timestamp(6)
 
-  // Relação com logs de email
-  logs      LogEmail[]
+  // Relacionamentos
+  logsEmail LogEmail[]
 
   @@map("templates_email")
 }
 
-model ConfiguracaoSistema {
-  id           Int      @id @default(autoincrement())
-  chave        String   @unique
-  valor        String
-  descricao    String?
-  tipo         String   @default("string") // "string", "number", "boolean", "json"
-  criadoEm     DateTime @default(now()) @map("criado_em")
-  atualizadoEm DateTime @updatedAt @map("atualizado_em")
-
-  @@map("configuracoes_sistema")
-}
-
+// Modelo de Log de Email
 model LogEmail {
-  id           Int      @id @default(autoincrement())
-  destinatario String
-  assunto      String
-  corpo        String   @db.Text
-  status       String   // "enviado", "erro", "pendente"
-  messageId    String?  @map("message_id")
-  erro         String?
-  templateId   Int?     @map("template_id")
-  agendarPara  DateTime? @map("agendar_para")
-  tentativas   Int      @default(1)
-  enviadoEm    DateTime? @map("enviado_em")
-  criadoEm     DateTime @default(now()) @map("criado_em")
+  id           Int               @id @default(autoincrement())
+  destinatario String            @db.VarChar(100)
+  assunto      String            @db.VarChar(200)
+  corpo        String            @db.Text
+  templateId   Int?              @map("template_id")
+  status       StatusEmailEnvio  @default(pendente)
+  tentativas   Int               @default(0)
+  ultimaTentativa DateTime?      @map("ultima_tentativa") @db.Timestamp(6)
+  erroEnvio    String?           @map("erro_envio") @db.Text
+  agendarPara  DateTime?         @map("agendar_para") @db.Timestamp(6)
+  enviadoEm    DateTime?         @map("enviado_em") @db.Timestamp(6)
+  criadoEm     DateTime          @default(now()) @map("criado_em") @db.Timestamp(6)
+  atualizadoEm DateTime          @updatedAt @map("atualizado_em") @db.Timestamp(6)
 
-  // Relação com template
-  template     TemplateEmail? @relation(fields: [templateId], references: [id])
+  // Relacionamentos
+  template TemplateEmail? @relation(fields: [templateId], references: [id], onDelete: SetNull)
 
   @@map("logs_email")
+}
+
+// Modelo de Configurações do Sistema
+model Configuracao {
+  id           Int              @id @default(autoincrement())
+  chave        String           @unique @db.VarChar(100)
+  valor        String           @db.Text
+  descricao    String?          @db.Text
+  tipo         TipoConfiguracao @default(string)
+  criadoEm     DateTime         @default(now()) @map("criado_em") @db.Timestamp(6)
+  atualizadoEm DateTime         @updatedAt @map("atualizado_em") @db.Timestamp(6)
+
+  @@map("configuracoes")
+}
+
+// Enums
+enum StatusContribuicao {
+  pendente
+  pago
+  atrasado
+  cancelado
+
+  @@map("status_contribuicao")
+}
+
+enum FormaPagamento {
+  pix
+  boleto
+  transferencia
+  dinheiro
+  cartao
+
+  @@map("forma_pagamento")
+}
+
+enum TipoMovimentacao {
+  entrada
+  saida
+
+  @@map("tipo_movimentacao")
+}
+
+enum StatusNotaFiscal {
+  emitida
+  cancelada
+
+  @@map("status_nota_fiscal")
+}
+
+enum TipoTemplateEmail {
+  cobranca
+  lembrete
+  agradecimento
+  boas_vindas
+
+  @@map("tipo_template_email")
+}
+
+enum StatusEmailEnvio {
+  pendente
+  enviado
+  erro
+  agendado
+
+  @@map("status_email_envio")
+}
+
+enum TipoConfiguracao {
+  string
+  number
+  boolean
+  json
+
+  @@map("tipo_configuracao")
 }

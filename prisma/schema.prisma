@@ -111,11 +111,14 @@ model TemplateEmail {
   id        Int      @id @default(autoincrement())
   nome      String   @unique
   assunto   String
-  corpo     String // HTML template
-  tipo      String // "cobranca", "lembrete", "agradecimento", etc.
+  corpo     String   @db.Text // HTML template
+  tipo      String   // "cobranca", "lembrete", "agradecimento", etc.
   ativo     Boolean  @default(true)
   criadoEm  DateTime @default(now()) @map("criado_em")
   atualizadoEm DateTime @updatedAt @map("atualizado_em")
+
+  // Relação com logs de email
+  logs      LogEmail[]
 
   @@map("templates_email")
 }
@@ -136,11 +139,18 @@ model LogEmail {
   id           Int      @id @default(autoincrement())
   destinatario String
   assunto      String
-  status       String // "enviado", "erro", "pendente"
+  corpo        String   @db.Text
+  status       String   // "enviado", "erro", "pendente"
+  messageId    String?  @map("message_id")
   erro         String?
+  templateId   Int?     @map("template_id")
+  agendarPara  DateTime? @map("agendar_para")
   tentativas   Int      @default(1)
   enviadoEm    DateTime? @map("enviado_em")
   criadoEm     DateTime @default(now()) @map("criado_em")
+
+  // Relação com template
+  template     TemplateEmail? @relation(fields: [templateId], references: [id])
 
   @@map("logs_email")
 }

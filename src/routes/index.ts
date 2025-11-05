@@ -6,6 +6,7 @@ import movimentacaoRoutes from "./movimentacaoRoutes.js";
 import contribuicaoRoutes from "./contribuicaoRoutes.js";
 import relatorioRoutes from "./relatorioRoutes.js";
 import notaFiscalRoutes from "./notaFiscalRoutes.js";
+import emailRoutes from "./emailRoutes.js";
 
 const router = Router();
 
@@ -16,6 +17,7 @@ router.use("/movimentacoes", movimentacaoRoutes);
 router.use("/contribuicoes", contribuicaoRoutes);
 router.use("/relatorios", relatorioRoutes);
 router.use("/notas-fiscais", notaFiscalRoutes);
+router.use("/emails", emailRoutes);
 
 // Rota de health check
 router.get("/health", (req, res) => {
@@ -30,6 +32,7 @@ router.get("/health", (req, res) => {
       contribuicoes: "/api/v1/contribuicoes",
       relatorios: "/api/v1/relatorios",
       notasFiscais: "/api/v1/notas-fiscais",
+      emails: "/api/v1/emails",
     },
   });
 });

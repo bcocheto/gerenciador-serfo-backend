@@ -99,7 +99,40 @@ export const templateEmailCreateSchema = z.object({
   tipo: z.enum(["cobranca", "lembrete", "agradecimento", "boas_vindas"]),
 });
 
-export const templateEmailUpdateSchema = templateEmailCreateSchema.partial();
+export const templateEmailUpdateSchema = templateEmailCreateSchema
+  .partial()
+  .extend({
+    ativo: z.boolean().optional(),
+  });
+
+// Validações para envio de emails
+export const enviarEmailSchema = z.object({
+  destinatario: z.string().email("Email inválido"),
+  assunto: z.string().min(1, "Assunto é obrigatório"),
+  corpo: z.string().min(1, "Corpo do email é obrigatório"),
+  templateId: z.number().int().positive().optional(),
+  agendarPara: z.string().datetime().optional(),
+});
+
+export const enviarEmailLoteSchema = z.object({
+  destinatarios: z
+    .array(z.string().email())
+    .min(1, "Pelo menos um destinatário é necessário"),
+  templateId: z
+    .number()
+    .int()
+    .positive("ID do template deve ser um número positivo"),
+  dados: z.record(z.string(), z.any()).optional(), // Dados para substituição no template
+  agendarPara: z.string().datetime().optional(),
+});
+
+export const logEmailCreateSchema = z.object({
+  destinatario: z.string().email("Email inválido"),
+  assunto: z.string().min(1, "Assunto é obrigatório"),
+  corpo: z.string().min(1, "Corpo do email é obrigatório"),
+  templateId: z.number().int().positive().optional(),
+  agendarPara: z.string().datetime().optional(),
+});
 
 // Validações para Notas Fiscais
 export const notaFiscalCreateSchema = z.object({
@@ -113,6 +146,34 @@ export const notaFiscalCreateSchema = z.object({
 export const notaFiscalUpdateSchema = z.object({
   status: z.enum(["emitida", "cancelada"]).optional(),
   observacoes: z.string().optional(),
+});
+
+// Validações para Email Service
+export const emailEnvioSchema = z.object({
+  destinatario: z.string().email("Email inválido"),
+  assunto: z.string().min(1, "Assunto é obrigatório").optional(),
+  corpo: z.string().min(1, "Corpo do email é obrigatório").optional(),
+  anexos: z.array(z.string()).optional(),
+  templateId: z.number().positive().optional(),
+  dados: z.record(z.string(), z.any()).optional(),
+  agendarPara: z.string().datetime().optional(),
+});
+
+export const emailDestinatarioSchema = z.object({
+  email: z.string().email("Email inválido"),
+  nome: z.string().min(1, "Nome é obrigatório"),
+  dados: z.record(z.string(), z.any()).optional(),
+});
+
+export const emailLoteSchema = z.object({
+  destinatarios: z
+    .array(emailDestinatarioSchema)
+    .min(1, "Lista de destinatários não pode estar vazia"),
+  templateId: z.number().positive().optional(),
+  assunto: z.string().min(1, "Assunto é obrigatório").optional(),
+  corpo: z.string().min(1, "Corpo do email é obrigatório").optional(),
+  anexos: z.array(z.string()).optional(),
+  agendarPara: z.string().datetime().optional(),
 });
 
 // Validações para Configurações do Sistema
@@ -145,6 +206,11 @@ export type ContribuicaoCreate = z.infer<typeof contribuicaoCreateSchema>;
 export type ContribuicaoUpdate = z.infer<typeof contribuicaoUpdateSchema>;
 export type NotaFiscalCreate = z.infer<typeof notaFiscalCreateSchema>;
 export type NotaFiscalUpdate = z.infer<typeof notaFiscalUpdateSchema>;
+export type EnviarEmail = z.infer<typeof enviarEmailSchema>;
+export type EnviarEmailLote = z.infer<typeof enviarEmailLoteSchema>;
+export type LogEmailCreate = z.infer<typeof logEmailCreateSchema>;
+export type EmailEnvio = z.infer<typeof emailEnvioSchema>;
+export type EmailLote = z.infer<typeof emailLoteSchema>;
 export type MovimentacaoCreate = z.infer<typeof movimentacaoCreateSchema>;
 export type MovimentacaoUpdate = z.infer<typeof movimentacaoUpdateSchema>;
 export type TemplateEmailCreate = z.infer<typeof templateEmailCreateSchema>;

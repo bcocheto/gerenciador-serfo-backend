@@ -63,6 +63,7 @@ app.get("/", (req, res) => {
       contribuicoes: "/api/v1/contribuicoes",
       relatorios: "/api/v1/relatorios",
       notasFiscais: "/api/v1/notas-fiscais",
+      emails: "/api/v1/emails",
       docs: "/api/v1/docs", // Para futura documentação
     },
   });

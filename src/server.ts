@@ -62,6 +62,7 @@ app.get("/", (req, res) => {
       movimentacoes: "/api/v1/movimentacoes",
       contribuicoes: "/api/v1/contribuicoes",
       relatorios: "/api/v1/relatorios",
+      notasFiscais: "/api/v1/notas-fiscais",
       docs: "/api/v1/docs", // Para futura documentação
     },
   });

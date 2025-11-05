@@ -101,6 +101,20 @@ export const templateEmailCreateSchema = z.object({
 
 export const templateEmailUpdateSchema = templateEmailCreateSchema.partial();
 
+// Validações para Notas Fiscais
+export const notaFiscalCreateSchema = z.object({
+  contribuicaoId: z
+    .number()
+    .int()
+    .positive("ID da contribuição deve ser um número positivo"),
+  observacoes: z.string().optional(),
+});
+
+export const notaFiscalUpdateSchema = z.object({
+  status: z.enum(["emitida", "cancelada"]).optional(),
+  observacoes: z.string().optional(),
+});
+
 // Validações para Configurações do Sistema
 export const configuracaoCreateSchema = z.object({
   chave: z.string().min(1, "Chave é obrigatória"),
@@ -129,6 +143,8 @@ export type AssistidoCreate = z.infer<typeof assistidoCreateSchema>;
 export type AssistidoUpdate = z.infer<typeof assistidoUpdateSchema>;
 export type ContribuicaoCreate = z.infer<typeof contribuicaoCreateSchema>;
 export type ContribuicaoUpdate = z.infer<typeof contribuicaoUpdateSchema>;
+export type NotaFiscalCreate = z.infer<typeof notaFiscalCreateSchema>;
+export type NotaFiscalUpdate = z.infer<typeof notaFiscalUpdateSchema>;
 export type MovimentacaoCreate = z.infer<typeof movimentacaoCreateSchema>;
 export type MovimentacaoUpdate = z.infer<typeof movimentacaoUpdateSchema>;
 export type TemplateEmailCreate = z.infer<typeof templateEmailCreateSchema>;

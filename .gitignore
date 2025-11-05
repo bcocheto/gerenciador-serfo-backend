@@ -5,6 +5,12 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+# Lock files (escolha um: package-lock.json OU yarn.lock)
+# Descomente a linha abaixo se preferir usar apenas npm
+# yarn.lock
+# Descomente a linha abaixo se preferir usar apenas yarn
+# package-lock.json
+
 # Environment variables
 .env
 .env.local
@@ -162,3 +168,23 @@ docs/_build/
 
 # Local development
 .local/
+
+# Projeto específico - Gerenciador SERFO
+# Arquivos de backup do banco
+*.dump
+*.sql.bak
+
+# Arquivos de relatórios gerados
+reports/
+relatorios/
+
+# Arquivos temporários de processamento
+temp_processing/
+
+# Logs específicos do sistema
+audit.log
+system.log
+
+# Arquivos de configuração local de desenvolvimento
+config.local.json
+settings.local.json

@@ -13,7 +13,11 @@
     "db:generate": "prisma generate",
     "db:studio": "prisma studio",
     "db:seed": "tsx scripts/seed.ts",
+    "db:seed:prod": "NODE_ENV=production tsx scripts/seed-production.ts",
+    "db:reset": "tsx scripts/reset-database.ts",
+    "db:fresh": "npm run db:reset && npm run db:seed",
     "test:db": "tsx scripts/test-db.ts",
+    "validate": "tsx scripts/validate-system.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -56,5 +60,8 @@
     "ts-node-dev": "^2.0.0",
     "tsx": "^4.20.6",
     "typescript": "^5.9.2"
+  },
+  "prisma": {
+    "seed": "tsx scripts/seed.ts"
   }
 }

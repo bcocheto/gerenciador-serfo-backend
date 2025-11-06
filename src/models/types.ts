@@ -16,6 +16,7 @@ export interface Voluntario extends BaseEntity {
   dataIngresso: Date;
   observacoes?: string | null;
   ativo: boolean;
+  status: string;
 }
 
 export interface Assistido extends BaseEntity {
@@ -29,6 +30,7 @@ export interface Assistido extends BaseEntity {
   diaVencimento: number;
   observacoes?: string | null;
   ativo: boolean;
+  status: string;
 }
 
 export interface Contribuicao extends BaseEntity {
@@ -39,6 +41,7 @@ export interface Contribuicao extends BaseEntity {
   dataPagamento?: Date | null;
   status: StatusContribuicao;
   formaPagamento?: FormaPagamento | null;
+  comprovante?: string | null;
   observacoes?: string | null;
 }
 
@@ -61,6 +64,7 @@ export interface NotaFiscal extends BaseEntity {
   dataEmissao: Date;
   valor: number;
   status: StatusNotaFiscal;
+  arquivo?: string | null;
   observacoes?: string | null;
 }
 

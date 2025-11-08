@@ -40,6 +40,19 @@ export class AssistidoService {
         throw new AppError("Valor mensal deve ser maior que zero", 400);
       }
 
+      // Verificar se sede existe
+      const sede = await prisma.sede.findUnique({
+        where: { id: data.sedeId },
+      });
+
+      if (!sede) {
+        throw new AppError("Sede não encontrada", 404);
+      }
+
+      if (!sede.ativo) {
+        throw new AppError("Sede inativa", 400);
+      }
+
       const createData = {
         nomeCompleto: data.nomeCompleto,
         email: data.email,
@@ -50,10 +63,16 @@ export class AssistidoService {
         telefone: data.telefone || null,
         endereco: data.endereco || null,
         observacoes: data.observacoes || null,
+        sedeId: data.sedeId,
       };
 
       const assistido = await prisma.assistido.create({
         data: createData,
+        include: {
+          sede: {
+            select: { id: true, nome: true },
+          },
+        },
       });
 
       return assistido;
@@ -69,6 +88,7 @@ export class AssistidoService {
       search?: string;
       valorMin?: number;
       valorMax?: number;
+      sedeId?: number;
     }
   ) {
     try {
@@ -81,6 +101,7 @@ export class AssistidoService {
         search,
         valorMin,
         valorMax,
+        sedeId,
       } = params;
       const skip = (page - 1) * limit;
 
@@ -88,6 +109,10 @@ export class AssistidoService {
 
       if (status) {
         where.status = status;
+      }
+
+      if (sedeId) {
+        where.sedeId = sedeId;
       }
 
       if (search) {
@@ -107,6 +132,11 @@ export class AssistidoService {
       const [assistidos, total] = await Promise.all([
         prisma.assistido.findMany({
           where,
+          include: {
+            sede: {
+              select: { id: true, nome: true },
+            },
+          },
           skip,
           take: limit,
           orderBy: { [orderBy]: orderDirection },
@@ -132,6 +162,11 @@ export class AssistidoService {
     try {
       const assistido = await prisma.assistido.findUnique({
         where: { id },
+        include: {
+          sede: {
+            select: { id: true, nome: true },
+          },
+        },
       });
 
       if (!assistido) {
@@ -191,6 +226,21 @@ export class AssistidoService {
         throw new AppError("Valor mensal deve ser maior que zero", 400);
       }
 
+      // Verificar sede se está sendo alterada
+      if (data.sedeId) {
+        const sede = await prisma.sede.findUnique({
+          where: { id: data.sedeId },
+        });
+
+        if (!sede) {
+          throw new AppError("Sede não encontrada", 404);
+        }
+
+        if (!sede.ativo) {
+          throw new AppError("Sede inativa", 400);
+        }
+      }
+
       const updateData: Record<string, any> = {};
 
       if (data.nomeCompleto !== undefined)
@@ -209,10 +259,16 @@ export class AssistidoService {
         updateData.valorMensal = data.valorMensal;
       if (data.diaVencimento !== undefined)
         updateData.diaVencimento = data.diaVencimento;
+      if (data.sedeId !== undefined) updateData.sedeId = data.sedeId;
 
       const assistido = await prisma.assistido.update({
         where: { id },
         data: updateData,
+        include: {
+          sede: {
+            select: { id: true, nome: true },
+          },
+        },
       });
 
       return assistido;

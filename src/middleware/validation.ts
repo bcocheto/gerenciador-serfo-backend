@@ -28,7 +28,8 @@ export const validateQuery = (schema: ZodSchema) => {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
       const parsedQuery = schema.parse(req.query);
-      req.query = parsedQuery as any;
+      // Armazena os parâmetros validados em uma propriedade customizada
+      (req as any).validatedQuery = parsedQuery;
       next();
     } catch (error) {
       if (error instanceof ZodError) {

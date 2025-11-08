@@ -6,7 +6,24 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("🌱 Iniciando seed do banco de dados...");
 
-  // 1. Criar configurações padrão do sistema
+  // 1. Criar sede padrão
+  console.log("🏢 Criando sede padrão...");
+
+  const sedeMatriz = await prisma.sede.upsert({
+    where: { nome: "Sede Matriz" },
+    update: {},
+    create: {
+      nome: "Sede Matriz",
+      endereco: "Endereço da Matriz",
+      telefone: "(11) 99999-9999",
+      email: "matriz@serfo.org",
+      ativo: true,
+    },
+  });
+
+  console.log(`✅ Sede ${sedeMatriz.nome} criada/atualizada`);
+
+  // 2. Criar configurações padrão do sistema
   console.log("📋 Criando configurações padrão...");
 
   await prisma.configuracao.upsert({
@@ -245,6 +262,8 @@ Equipe SERFO
         observacoes: "Administrador do sistema",
         ativo: true,
         status: "ativo",
+        cargo: "PRESIDENTE",
+        sedeId: sedeMatriz.id,
       },
     });
 
@@ -263,6 +282,7 @@ Equipe SERFO
         observacoes: "Assistida modelo para testes",
         ativo: true,
         status: "ativo",
+        sedeId: sedeMatriz.id,
       },
     });
 

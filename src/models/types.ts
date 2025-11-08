@@ -7,6 +7,22 @@ export interface BaseEntity {
   atualizadoEm: Date;
 }
 
+// Enum para cargos de voluntários
+export enum CargoVoluntario {
+  VOLUNTARIO = "VOLUNTARIO",
+  SECRETARIO = "SECRETARIO",
+  TESOUREIRO = "TESOUREIRO",
+  PRESIDENTE = "PRESIDENTE",
+}
+
+export interface Sede extends BaseEntity {
+  nome: string;
+  endereco?: string | null;
+  telefone?: string | null;
+  email?: string | null;
+  ativo: boolean;
+}
+
 export interface Voluntario extends BaseEntity {
   nomeCompleto: string;
   cpf?: string | null;
@@ -17,6 +33,8 @@ export interface Voluntario extends BaseEntity {
   observacoes?: string | null;
   ativo: boolean;
   status: string;
+  sedeId: number;
+  cargo: CargoVoluntario;
 }
 
 export interface Assistido extends BaseEntity {
@@ -31,6 +49,7 @@ export interface Assistido extends BaseEntity {
   observacoes?: string | null;
   ativo: boolean;
   status: string;
+  sedeId: number;
 }
 
 export interface Contribuicao extends BaseEntity {
@@ -144,11 +163,22 @@ export enum TipoConfiguracao {
 }
 
 // Types para relações (com includes)
+export interface SedeWithRelations extends Sede {
+  voluntarios?: Voluntario[];
+  assistidos?: Assistido[];
+  _count?: {
+    voluntarios: number;
+    assistidos: number;
+  };
+}
+
 export interface VoluntarioWithRelations extends Voluntario {
+  sede?: Sede;
   contribuicoes?: Contribuicao[];
 }
 
 export interface AssistidoWithRelations extends Assistido {
+  sede?: Sede;
   contribuicoes?: Contribuicao[];
 }
 
@@ -199,10 +229,18 @@ export interface BaseFilter {
   orderDirection?: "asc" | "desc";
 }
 
+export interface SedeFilter extends BaseFilter {
+  search?: string;
+  ativo?: boolean;
+  nome?: string;
+}
+
 export interface VoluntarioFilter extends BaseFilter {
   search?: string;
   ativo?: boolean;
   dataIngressoRange?: DateRangeFilter;
+  sedeId?: number;
+  cargo?: CargoVoluntario;
 }
 
 export interface AssistidoFilter extends BaseFilter {
@@ -213,6 +251,7 @@ export interface AssistidoFilter extends BaseFilter {
     min?: number;
     max?: number;
   };
+  sedeId?: number;
 }
 
 export interface ContribuicaoFilter extends BaseFilter {

@@ -16,12 +16,23 @@ import {
   voluntarioUpdateSchema,
   paginationSchema,
 } from "../config/validations.js";
+import { z } from "zod";
 
 const router = Router();
 
+// Schema para validar parâmetros de consulta específicos de voluntários
+const voluntarioQuerySchema = paginationSchema.extend({
+  status: z.enum(["ativo", "inativo", "suspenso"]).optional(),
+  search: z.string().optional(),
+  sedeId: z.coerce.number().positive().optional(),
+  cargo: z
+    .enum(["VOLUNTARIO", "SECRETARIO", "TESOUREIRO", "PRESIDENTE"])
+    .optional(),
+});
+
 // Rotas públicas (para demonstração - remover em produção)
 router.get("/statistics", getVoluntarioStatistics);
-router.get("/", validateQuery(paginationSchema), getVoluntarios);
+router.get("/", validateQuery(voluntarioQuerySchema), getVoluntarios);
 router.get("/:id", getVoluntarioById);
 
 // Rotas protegidas (precisam de autenticação)

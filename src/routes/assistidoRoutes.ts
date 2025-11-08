@@ -28,6 +28,7 @@ const assistidoQuerySchema = paginationSchema.extend({
   search: z.string().optional(),
   valorMin: z.coerce.number().positive().optional(),
   valorMax: z.coerce.number().positive().optional(),
+  sedeId: z.coerce.number().positive().optional(),
 });
 
 // Schema para atualização de status

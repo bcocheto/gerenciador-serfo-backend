@@ -19,7 +19,8 @@ export const createAssistido = asyncHandler(
 
 export const getAssistidos = asyncHandler(
   async (req: Request, res: Response) => {
-    const result = await assistidoService.findAll(req.query as any);
+    const query = (req as any).validatedQuery || req.query;
+    const result = await assistidoService.findAll(query);
 
     res.json({
       success: true,

@@ -19,7 +19,8 @@ export const createVoluntario = asyncHandler(
 
 export const getVoluntarios = asyncHandler(
   async (req: Request, res: Response) => {
-    const result = await voluntarioService.findAll(req.query as any);
+    const query = (req as any).validatedQuery || req.query;
+    const result = await voluntarioService.findAll(query);
 
     res.json({
       success: true,

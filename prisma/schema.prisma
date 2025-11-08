@@ -8,22 +8,53 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Modelo de Voluntário
-model Voluntario {
+// Enum para cargos de voluntários
+enum CargoVoluntario {
+  VOLUNTARIO
+  SECRETARIO
+  TESOUREIRO
+  PRESIDENTE
+
+  @@map("cargo_voluntario")
+}
+
+// Modelo de Sede
+model Sede {
   id           Int      @id @default(autoincrement())
-  nomeCompleto String   @map("nome_completo") @db.VarChar(100)
-  cpf          String?  @unique @db.VarChar(11)
-  telefone     String?  @db.VarChar(20)
-  email        String   @unique @db.VarChar(100)
+  nome         String   @unique @db.VarChar(100)
   endereco     String?  @db.Text
-  dataIngresso DateTime @map("data_ingresso") @db.Timestamp(6)
-  observacoes  String?  @db.Text
+  telefone     String?  @db.VarChar(20)
+  email        String?  @db.VarChar(100)
   ativo        Boolean  @default(true)
-  status       String   @default("ativo") @db.VarChar(20) // Para compatibilidade com código existente
   criadoEm     DateTime @default(now()) @map("criado_em") @db.Timestamp(6)
   atualizadoEm DateTime @updatedAt @map("atualizado_em") @db.Timestamp(6)
 
   // Relacionamentos
+  voluntarios Voluntario[]
+  assistidos  Assistido[]
+
+  @@map("sedes")
+}
+
+// Modelo de Voluntário
+model Voluntario {
+  id           Int             @id @default(autoincrement())
+  nomeCompleto String          @map("nome_completo") @db.VarChar(100)
+  cpf          String?         @unique @db.VarChar(11)
+  telefone     String?         @db.VarChar(20)
+  email        String          @unique @db.VarChar(100)
+  endereco     String?         @db.Text
+  dataIngresso DateTime        @map("data_ingresso") @db.Timestamp(6)
+  observacoes  String?         @db.Text
+  ativo        Boolean         @default(true)
+  status       String          @default("ativo") @db.VarChar(20) // Para compatibilidade com código existente
+  sedeId       Int             @map("sede_id")
+  cargo        CargoVoluntario @default(VOLUNTARIO)
+  criadoEm     DateTime        @default(now()) @map("criado_em") @db.Timestamp(6)
+  atualizadoEm DateTime        @updatedAt @map("atualizado_em") @db.Timestamp(6)
+
+  // Relacionamentos
+  sede          Sede           @relation(fields: [sedeId], references: [id])
   contribuicoes Contribuicao[]
 
   @@map("voluntarios")
@@ -43,10 +74,12 @@ model Assistido {
   observacoes    String?  @db.Text
   ativo          Boolean  @default(true)
   status         String   @default("ativo") @db.VarChar(20) // Para compatibilidade com código existente
+  sedeId         Int      @map("sede_id")
   criadoEm       DateTime @default(now()) @map("criado_em") @db.Timestamp(6)
   atualizadoEm   DateTime @updatedAt @map("atualizado_em") @db.Timestamp(6)
 
   // Relacionamentos
+  sede          Sede           @relation(fields: [sedeId], references: [id])
   contribuicoes Contribuicao[]
 
   @@map("assistidos")

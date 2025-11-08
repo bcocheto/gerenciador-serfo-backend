@@ -1,6 +1,26 @@
 // src/config/validations.ts
 import { z } from "zod";
 
+// Validações para Sedes
+export const sedeCreateSchema = z.object({
+  nome: z.string().min(1, "Nome é obrigatório").max(100, "Nome muito longo"),
+  endereco: z.string().optional(),
+  telefone: z.string().optional(),
+  email: z.string().email("Email inválido").optional(),
+});
+
+export const sedeUpdateSchema = z.object({
+  nome: z
+    .string()
+    .min(1, "Nome é obrigatório")
+    .max(100, "Nome muito longo")
+    .optional(),
+  endereco: z.string().optional(),
+  telefone: z.string().optional(),
+  email: z.string().email("Email inválido").optional(),
+  ativo: z.boolean().optional(),
+});
+
 // Validações para Voluntários
 export const voluntarioCreateSchema = z.object({
   nomeCompleto: z
@@ -16,6 +36,10 @@ export const voluntarioCreateSchema = z.object({
   endereco: z.string().optional(),
   dataIngresso: z.string().datetime("Data de ingresso inválida"),
   observacoes: z.string().optional(),
+  sedeId: z.number().int().positive("Sede é obrigatória"),
+  cargo: z
+    .enum(["VOLUNTARIO", "SECRETARIO", "TESOUREIRO", "PRESIDENTE"])
+    .default("VOLUNTARIO"),
 });
 
 export const voluntarioUpdateSchema = voluntarioCreateSchema.partial();
@@ -40,6 +64,7 @@ export const assistidoCreateSchema = z.object({
     .min(1, "Dia deve ser entre 1 e 31")
     .max(31, "Dia deve ser entre 1 e 31"),
   observacoes: z.string().optional(),
+  sedeId: z.number().int().positive("Sede é obrigatória"),
 });
 
 export const assistidoUpdateSchema = assistidoCreateSchema.partial();
@@ -198,6 +223,8 @@ export const dateRangeSchema = z.object({
 });
 
 // Tipos TypeScript exportados
+export type SedeCreate = z.infer<typeof sedeCreateSchema>;
+export type SedeUpdate = z.infer<typeof sedeUpdateSchema>;
 export type VoluntarioCreate = z.infer<typeof voluntarioCreateSchema>;
 export type VoluntarioUpdate = z.infer<typeof voluntarioUpdateSchema>;
 export type AssistidoCreate = z.infer<typeof assistidoCreateSchema>;

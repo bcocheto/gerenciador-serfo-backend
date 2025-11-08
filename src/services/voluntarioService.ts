@@ -29,6 +29,19 @@ export class VoluntarioService {
         }
       }
 
+      // Verificar se sede existe
+      const sede = await prisma.sede.findUnique({
+        where: { id: data.sedeId },
+      });
+
+      if (!sede) {
+        throw new AppError("Sede não encontrada", 404);
+      }
+
+      if (!sede.ativo) {
+        throw new AppError("Sede inativa", 400);
+      }
+
       const createData = {
         nomeCompleto: data.nomeCompleto,
         email: data.email,
@@ -37,10 +50,17 @@ export class VoluntarioService {
         telefone: data.telefone || null,
         endereco: data.endereco || null,
         observacoes: data.observacoes || null,
+        sedeId: data.sedeId,
+        cargo: data.cargo || "VOLUNTARIO",
       };
 
       const voluntario = await prisma.voluntario.create({
         data: createData,
+        include: {
+          sede: {
+            select: { id: true, nome: true },
+          },
+        },
       });
 
       return voluntario;
@@ -51,7 +71,12 @@ export class VoluntarioService {
   }
 
   async findAll(
-    params: PaginationParams & { status?: string; search?: string }
+    params: PaginationParams & {
+      status?: string;
+      search?: string;
+      sedeId?: number;
+      cargo?: string;
+    }
   ) {
     try {
       const {
@@ -61,6 +86,8 @@ export class VoluntarioService {
         orderDirection,
         status,
         search,
+        sedeId,
+        cargo,
       } = params;
       const skip = (page - 1) * limit;
 
@@ -68,6 +95,14 @@ export class VoluntarioService {
 
       if (status) {
         where.status = status;
+      }
+
+      if (sedeId) {
+        where.sedeId = sedeId;
+      }
+
+      if (cargo) {
+        where.cargo = cargo;
       }
 
       if (search) {
@@ -81,6 +116,11 @@ export class VoluntarioService {
       const [voluntarios, total] = await Promise.all([
         prisma.voluntario.findMany({
           where,
+          include: {
+            sede: {
+              select: { id: true, nome: true },
+            },
+          },
           skip,
           take: limit,
           orderBy: { [orderBy]: orderDirection },
@@ -106,6 +146,11 @@ export class VoluntarioService {
     try {
       const voluntario = await prisma.voluntario.findUnique({
         where: { id },
+        include: {
+          sede: {
+            select: { id: true, nome: true },
+          },
+        },
       });
 
       if (!voluntario) {
@@ -152,6 +197,21 @@ export class VoluntarioService {
         }
       }
 
+      // Verificar sede se está sendo alterada
+      if (data.sedeId) {
+        const sede = await prisma.sede.findUnique({
+          where: { id: data.sedeId },
+        });
+
+        if (!sede) {
+          throw new AppError("Sede não encontrada", 404);
+        }
+
+        if (!sede.ativo) {
+          throw new AppError("Sede inativa", 400);
+        }
+      }
+
       const updateData: Record<string, any> = {};
 
       if (data.nomeCompleto !== undefined)
@@ -166,10 +226,17 @@ export class VoluntarioService {
         updateData.observacoes = data.observacoes || null;
       if (data.dataIngresso !== undefined)
         updateData.dataIngresso = new Date(data.dataIngresso);
+      if (data.sedeId !== undefined) updateData.sedeId = data.sedeId;
+      if (data.cargo !== undefined) updateData.cargo = data.cargo;
 
       const voluntario = await prisma.voluntario.update({
         where: { id },
         data: updateData,
+        include: {
+          sede: {
+            select: { id: true, nome: true },
+          },
+        },
       });
 
       return voluntario;

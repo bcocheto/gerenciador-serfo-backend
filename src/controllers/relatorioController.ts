@@ -262,6 +262,20 @@ export class RelatorioController {
       throw error;
     }
   }
+
+  async getAtividadesRecentes(req: Request, res: Response) {
+    try {
+      const limite = parseInt(req.query.limite as string) || 10;
+      const atividades = await relatorioService.getAtividadesRecentes(limite);
+
+      res.json({
+        success: true,
+        data: atividades,
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 export const relatorioController = new RelatorioController();

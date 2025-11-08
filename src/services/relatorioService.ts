@@ -649,4 +649,71 @@ export class RelatorioService {
     );
     return totalValor / dados.length;
   }
+
+  async getAtividadesRecentes(limite: number = 10) {
+    try {
+      // Por enquanto, vamos retornar atividades simuladas baseadas em dados reais
+      const [recentVoluntarios, recentAssistidos, recentContribuicoes] =
+        await Promise.all([
+          prisma.voluntario.findMany({
+            take: 3,
+            orderBy: { criadoEm: "desc" },
+            include: { sede: { select: { nome: true } } },
+          }),
+          prisma.assistido.findMany({
+            take: 3,
+            orderBy: { criadoEm: "desc" },
+            include: { sede: { select: { nome: true } } },
+          }),
+          prisma.contribuicao.findMany({
+            take: 4,
+            orderBy: { criadoEm: "desc" },
+            include: {
+              voluntario: { select: { nomeCompleto: true } },
+              assistido: { select: { nomeCompleto: true } },
+            },
+          }),
+        ]);
+
+      const atividades = [
+        ...recentVoluntarios.map((v) => ({
+          id: `vol-${v.id}`,
+          tipo: "voluntario_cadastrado",
+          descricao: `Novo voluntário cadastrado: ${v.nomeCompleto}`,
+          data: v.criadoEm.toISOString(),
+          sede: v.sede.nome,
+          valor: null,
+        })),
+        ...recentAssistidos.map((a) => ({
+          id: `ass-${a.id}`,
+          tipo: "assistido_cadastrado",
+          descricao: `Novo assistido cadastrado: ${a.nomeCompleto}`,
+          data: a.criadoEm.toISOString(),
+          sede: a.sede.nome,
+          valor: Number(a.valorMensal),
+        })),
+        ...recentContribuicoes.map((c) => ({
+          id: `cont-${c.id}`,
+          tipo: "contribuicao_recebida",
+          descricao: `Contribuição recebida${
+            c.voluntario
+              ? ` de ${c.voluntario.nomeCompleto}`
+              : c.assistido
+              ? ` de ${c.assistido.nomeCompleto}`
+              : ""
+          }`,
+          data: c.criadoEm.toISOString(),
+          sede: null,
+          valor: Number(c.valor),
+        })),
+      ];
+
+      // Ordenar por data decrescente e limitar
+      return atividades
+        .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime())
+        .slice(0, limite);
+    } catch (error) {
+      throw new AppError("Erro ao buscar atividades recentes", 500);
+    }
+  }
 }

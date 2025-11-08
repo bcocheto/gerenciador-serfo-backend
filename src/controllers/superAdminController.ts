@@ -128,6 +128,15 @@ export const deleteAssistidoAnySede = asyncHandler(
 
 // ========== GESTÃO DE SEDES ==========
 
+export const getAllSedes = asyncHandler(async (req: Request, res: Response) => {
+  const sedes = await superAdminService.getAllSedes();
+
+  res.json({
+    success: true,
+    data: sedes,
+  });
+});
+
 export const createSedeAdmin = asyncHandler(
   async (req: Request, res: Response) => {
     const sede = await superAdminService.createSede(req.body);

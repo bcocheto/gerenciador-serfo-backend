@@ -34,7 +34,21 @@ const limiter = rateLimit({
 // Middlewares de segurança
 app.use(helmet()); // Define vários headers de segurança
 app.use(limiter); // Rate limiting
-app.use(cors()); // Permite requisições de diferentes origens
+
+// Configuração CORS mais específica
+app.use(
+  cors({
+    origin: [
+      "http://localhost:8080",
+      "http://localhost:8081",
+      "http://localhost:3000",
+    ],
+    credentials: true,
+    optionsSuccessStatus: 200,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+  })
+); // Permite requisições de diferentes origens
 app.use(express.json({ limit: "10mb" })); // Permite que o Express entenda JSON
 app.use(express.urlencoded({ extended: true })); // Para formulários
 

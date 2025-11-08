@@ -9,6 +9,7 @@ import {
   createAssistidoInAnySede,
   updateAssistidoAnySede,
   deleteAssistidoAnySede,
+  getAllSedes,
   createSedeAdmin,
   updateSedeAdmin,
   deleteSedeAdmin,
@@ -110,6 +111,7 @@ router.put(
 router.delete("/assistidos/:id", deleteAssistidoAnySede);
 
 // ========== GESTÃO DE SEDES ==========
+router.get("/sedes", getAllSedes);
 router.post("/sedes", validateBody(sedeCreateSchema), createSedeAdmin);
 router.put("/sedes/:id", validateBody(sedeUpdateSchema), updateSedeAdmin);
 router.delete("/sedes/:id", deleteSedeAdmin);

@@ -44,6 +44,7 @@ model Voluntario {
   cpf          String?         @unique @db.VarChar(11)
   telefone     String?         @db.VarChar(20)
   email        String          @unique @db.VarChar(100)
+  senha        String?         @db.VarChar(255) // Campo para armazenar senha hash
   endereco     String?         @db.Text
   dataIngresso DateTime        @map("data_ingresso") @db.Timestamp(6)
   observacoes  String?         @db.Text

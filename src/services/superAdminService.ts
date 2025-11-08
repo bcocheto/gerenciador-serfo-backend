@@ -501,8 +501,8 @@ export class SuperAdminService {
         id: sede.id,
         nome: sede.nome,
         endereco: sede.endereco || "",
-        cidade: sede.cidade || "",
-        cep: sede.cep || "",
+        cidade: "", // Será extraído do endereço se necessário
+        cep: "", // Será extraído do endereço se necessário
         telefone: sede.telefone || "",
         email: sede.email || "",
         isAtiva: sede.ativo,

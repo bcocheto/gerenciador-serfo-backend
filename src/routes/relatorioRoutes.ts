@@ -21,6 +21,10 @@ router.get(
   "/metricas-chave",
   relatorioController.getMetricasChave.bind(relatorioController)
 );
+router.get(
+  "/atividades-recentes",
+  relatorioController.getAtividadesRecentes.bind(relatorioController)
+);
 
 // Relatórios específicos
 router.get(

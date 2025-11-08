@@ -483,6 +483,41 @@ export class SuperAdminService {
 
   // ========== GESTÃO DE SEDES ==========
 
+  async getAllSedes() {
+    try {
+      const sedes = await prisma.sede.findMany({
+        include: {
+          _count: {
+            select: {
+              voluntarios: { where: { ativo: true } },
+              assistidos: { where: { ativo: true } },
+            },
+          },
+        },
+        orderBy: { nome: "asc" },
+      });
+
+      return sedes.map((sede) => ({
+        id: sede.id,
+        nome: sede.nome,
+        endereco: sede.endereco || "",
+        cidade: sede.cidade || "",
+        cep: sede.cep || "",
+        telefone: sede.telefone || "",
+        email: sede.email || "",
+        isAtiva: sede.ativo,
+        createdAt: sede.criadoEm.toISOString(),
+        updatedAt: sede.atualizadoEm.toISOString(),
+        _count: {
+          voluntarios: sede._count.voluntarios,
+          assistidos: sede._count.assistidos,
+        },
+      }));
+    } catch (error) {
+      throw new AppError("Erro ao buscar sedes", 500);
+    }
+  }
+
   async createSede(data: SedeCreate) {
     try {
       const existingSede = await prisma.sede.findUnique({

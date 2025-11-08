@@ -1,5 +1,6 @@
 // src/routes/index.ts
 import { Router } from "express";
+import authRoutes from "./authRoutes.js";
 import voluntarioRoutes from "./voluntarioRoutes.js";
 import assistidoRoutes from "./assistidoRoutes.js";
 import movimentacaoRoutes from "./movimentacaoRoutes.js";
@@ -13,6 +14,7 @@ import superAdminRoutes from "./superAdminRoutes.js";
 const router = Router();
 
 // Definir todas as rotas da API
+router.use("/auth", authRoutes);
 router.use("/voluntarios", voluntarioRoutes);
 router.use("/assistidos", assistidoRoutes);
 router.use("/movimentacoes", movimentacaoRoutes);

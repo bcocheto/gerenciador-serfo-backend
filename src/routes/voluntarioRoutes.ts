@@ -26,7 +26,13 @@ const voluntarioQuerySchema = paginationSchema.extend({
   search: z.string().optional(),
   sedeId: z.coerce.number().positive().optional(),
   cargo: z
-    .enum(["VOLUNTARIO", "SECRETARIO", "TESOUREIRO", "PRESIDENTE"])
+    .enum([
+      "VOLUNTARIO",
+      "SECRETARIO",
+      "TESOUREIRO",
+      "PRESIDENTE",
+      "SUPER_ADMIN",
+    ])
     .optional(),
 });
 

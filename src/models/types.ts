@@ -13,6 +13,7 @@ export enum CargoVoluntario {
   SECRETARIO = "SECRETARIO",
   TESOUREIRO = "TESOUREIRO",
   PRESIDENTE = "PRESIDENTE",
+  SUPER_ADMIN = "SUPER_ADMIN",
 }
 
 export interface Sede extends BaseEntity {

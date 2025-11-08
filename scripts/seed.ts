@@ -21,7 +21,20 @@ async function main() {
     },
   });
 
-  console.log(`✅ Sede ${sedeMatriz.nome} criada/atualizada`);
+  // Criar sede administrativa para Super Admin
+  const sedeAdmin = await prisma.sede.upsert({
+    where: { nome: "Administração Geral" },
+    update: {},
+    create: {
+      nome: "Administração Geral",
+      endereco: "Sede Administrativa Principal",
+      telefone: "(11) 1111-1111",
+      email: "admin@serfo.org",
+      ativo: true,
+    },
+  });
+
+  console.log(`✅ Sedes criadas: ${sedeMatriz.nome} e ${sedeAdmin.nome}`);
 
   // 2. Criar configurações padrão do sistema
   console.log("📋 Criando configurações padrão...");
@@ -245,11 +258,36 @@ Equipe SERFO
     },
   });
 
-  // 3. Criar dados de exemplo (apenas em desenvolvimento)
+  // 3. Criar Super Administrador
+  console.log("👤 Criando Super Administrador...");
+
+  const superAdmin = await prisma.voluntario.upsert({
+    where: { email: "superadmin@serfo.org" },
+    update: {
+      cargo: "SUPER_ADMIN",
+      observacoes: "Super Administrador - Acesso Total ao Sistema",
+    },
+    create: {
+      nomeCompleto: "Super Administrador",
+      email: "superadmin@serfo.org",
+      telefone: "(11) 1111-1111",
+      endereco: "Administração Central",
+      dataIngresso: new Date("2023-01-01"),
+      observacoes: "Super Administrador - Acesso Total ao Sistema",
+      ativo: true,
+      status: "ativo",
+      cargo: "SUPER_ADMIN",
+      sedeId: sedeAdmin.id,
+    },
+  });
+
+  console.log(`✅ Super Admin criado: ${superAdmin.nomeCompleto}`);
+
+  // 4. Criar dados de exemplo (apenas em desenvolvimento)
   if (process.env.NODE_ENV === "development") {
     console.log("👥 Criando dados de exemplo para desenvolvimento...");
 
-    // Voluntário exemplo
+    // Voluntário exemplo (Presidente da Matriz)
     const voluntarioExemplo = await prisma.voluntario.upsert({
       where: { email: "admin@serfo.org" },
       update: {},
@@ -324,6 +362,9 @@ Equipe SERFO
     });
 
     console.log("✅ Dados de exemplo criados com sucesso!");
+    console.log("\n📝 Credenciais criadas:");
+    console.log(`Super Admin: superadmin@serfo.org`);
+    console.log(`Presidente Matriz: admin@serfo.org`);
   }
 
   console.log("🎉 Seed concluído com sucesso!");

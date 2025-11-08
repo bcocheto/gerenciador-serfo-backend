@@ -2,11 +2,14 @@
 import jwt from "jsonwebtoken";
 import type { Request, Response, NextFunction } from "express";
 import { AppError } from "./errorHandler.js";
+import { CargoVoluntario } from "../models/types.js";
 
 interface TokenPayload {
   id: number;
   email: string;
   role: string;
+  cargo: CargoVoluntario;
+  sedeId: number;
 }
 
 declare global {
@@ -63,8 +66,31 @@ export const requireAdmin = (
     throw new AppError("Usuário não autenticado", 401);
   }
 
-  if (req.user.role !== "admin") {
+  // Super Admin ou Presidente tem privilégios administrativos
+  const hasAdminPrivileges = [
+    CargoVoluntario.SUPER_ADMIN,
+    CargoVoluntario.PRESIDENTE,
+  ].includes(req.user.cargo);
+
+  if (!hasAdminPrivileges) {
     throw new AppError("Acesso negado. Apenas administradores.", 403);
+  }
+
+  next();
+};
+
+// Novo middleware específico para Super Admin
+export const requireSuperAdminOnly = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  if (!req.user) {
+    throw new AppError("Usuário não autenticado", 401);
+  }
+
+  if (req.user.cargo !== CargoVoluntario.SUPER_ADMIN) {
+    throw new AppError("Acesso negado. Apenas Super Administradores.", 403);
   }
 
   next();

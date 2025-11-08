@@ -38,7 +38,13 @@ export const voluntarioCreateSchema = z.object({
   observacoes: z.string().optional(),
   sedeId: z.number().int().positive("Sede é obrigatória"),
   cargo: z
-    .enum(["VOLUNTARIO", "SECRETARIO", "TESOUREIRO", "PRESIDENTE"])
+    .enum([
+      "VOLUNTARIO",
+      "SECRETARIO",
+      "TESOUREIRO",
+      "PRESIDENTE",
+      "SUPER_ADMIN",
+    ])
     .default("VOLUNTARIO"),
 });
 
